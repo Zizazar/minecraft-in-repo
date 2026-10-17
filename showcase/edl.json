@@ -1,0 +1,17 @@
+{
+  "size": [1920, 1080], "fps": 30,
+  "theme": {"accent": "#7BD33F"},
+  "transition": {"type": "fade", "duration": 0.3},
+  "clip_volume": 0.8,
+  "fade_out": 0.8,
+  "normalize_audio": true,
+  "segments": [
+    {"clip": "take2c.mp4", "in": 4.0, "dur": 4.4, "zoom": 1.04, "hook": "R.E.P.O., but Minecraft."},
+    {"clip": "take2c.mp4", "in": 9.9, "dur": 3.6, "zoom": 1.04, "title": "TNT, flint and steel", "transition": {"type": "fade", "duration": 0.07}},
+    {"clip": "take6c.mp4", "in": 2.6, "dur": 2.3, "zoom": 1.04, "title": "Bow and arrows", "transition": {"type": "pixelize", "duration": 0.3}},
+    {"clip": "take6c.mp4", "in": 6.4, "dur": 2.2, "zoom": 1.04, "title": "Ender pearls", "transition": {"type": "fade", "duration": 0.07}},
+    {"clip": "take4c.mp4", "in": 0.9, "dur": 4.6, "zoom": 1.6, "title": "Sword and shield on the robot", "transition": {"type": "slideleft", "duration": 0.3}},
+    {"clip": "take3c.mp4", "in": 3.0, "dur": 5.2, "zoom": 1.25, "title": "The Minecraft inventory"},
+    {"card": {"title": "Minecraft Player in R.E.P.O.", "sub": "a BepInEx mod for R.E.P.O."}, "dur": 2.6}
+  ]
+}

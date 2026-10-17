@@ -1,0 +1,51 @@
+name: Build and release
+
+# Builds on a self-hosted Windows runner (label: repo-modding) because the plugin compiles
+# against R.E.P.O.'s game DLLs and BepInEx, which can't be distributed through GitHub.
+# Optional repository variables: REPO_DIR (game folder), BEPINEX_DIR (BepInEx folder).
+# Defaults come from MinecraftRepo.csproj.
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: [self-hosted, windows, repo-modding]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        shell: pwsh
+        run: >
+          dotnet build src/MinecraftRepo/MinecraftRepo.csproj -c Release
+          "-p:RepoDir=${{ vars.REPO_DIR }}" "-p:BepInExDir=${{ vars.BEPINEX_DIR }}"
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $out = 'src/MinecraftRepo/bin/Release/netstandard2.1'
+          New-Item -ItemType Directory -Force dist/plugins/MinecraftRepo | Out-Null
+          Copy-Item "$out/MinecraftRepo.dll" dist/plugins/MinecraftRepo/
+          Copy-Item README.md dist/
+          $name = if ($env:GITHUB_REF_TYPE -eq 'tag') { "MinecraftRepo-$env:GITHUB_REF_NAME" } else { "MinecraftRepo-$($env:GITHUB_SHA.Substring(0,7))" }
+          Compress-Archive -Path dist/* -DestinationPath "$name.zip" -Force
+          "ZIP=$name.zip" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MinecraftRepo
+          path: ${{ env.ZIP }}
+
+      - name: Publish release
+        if: github.ref_type == 'tag'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$env:GITHUB_REF_NAME" "$env:ZIP" --title "$env:GITHUB_REF_NAME" --generate-notes
