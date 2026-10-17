@@ -23,9 +23,16 @@ jobs:
 
       - name: Build
         shell: pwsh
-        run: >
-          dotnet build src/MinecraftRepo/MinecraftRepo.csproj -c Release
-          "-p:RepoDir=${{ vars.REPO_DIR }}" "-p:BepInExDir=${{ vars.BEPINEX_DIR }}"
+        env:
+          REPO_DIR: ${{ vars.REPO_DIR }}
+          BEPINEX_DIR: ${{ vars.BEPINEX_DIR }}
+        run: |
+          # Empty global properties would override the csproj defaults, so pass only what is set.
+          $props = @()
+          if ($env:REPO_DIR) { $props += "-p:RepoDir=$env:REPO_DIR" }
+          if ($env:BEPINEX_DIR) { $props += "-p:BepInExDir=$env:BEPINEX_DIR" }
+          dotnet build src/MinecraftRepo/MinecraftRepo.csproj -c Release @props
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Package
         shell: pwsh
